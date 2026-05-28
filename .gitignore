@@ -1,5 +1,4 @@
-# Dados de runtime — imagens em base64, não versionar
-.image-slots.state.json
+# Thumbnail interno
 .thumbnail
 
 # Tema WordPress de referência — externo, não faz parte do projeto
