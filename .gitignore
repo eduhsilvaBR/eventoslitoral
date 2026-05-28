@@ -1,0 +1,15 @@
+# Dados de runtime — imagens em base64, não versionar
+.image-slots.state.json
+.thumbnail
+
+# Tema WordPress de referência — externo, não faz parte do projeto
+reflector/
+
+# Uploads de usuário — binários
+uploads/
+
+# Pasta vazia
+EVENTOS/
+
+# Node
+node_modules/

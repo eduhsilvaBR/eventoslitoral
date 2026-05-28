@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ADM — Eventos Litoral</title>
+<link rel="icon" href="LOGO.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:   #0d0d0d;
+    --bg2:  #141414;
+    --bg3:  #1a1a1a;
+    --line: rgba(255,255,255,.08);
+    --ink:  #f0ece0;
+    --dim:  rgba(240,236,224,.55);
+    --mute: rgba(240,236,224,.3);
+    --gold: #d4af37;
+    --gold-bg: rgba(212,175,55,.1);
+    --red:  #e05555;
+    --green:#4caf7d;
+    --r: 4px;
+  }
+  *, *::before, *::after { box-sizing: border-box }
+  html, body { margin:0; padding:0; background:var(--bg); color:var(--ink);
+    font-family:'Space Grotesk', system-ui, sans-serif; font-size:14px;
+    -webkit-font-smoothing:antialiased; }
+  a { color:inherit; text-decoration:none }
+  input, textarea, select { font-family:inherit }
+
+  /* ── LAYOUT ── */
+  .adm-header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(13,13,13,.92); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 32px; height:60px;
+  }
+  .adm-logo { display:flex; align-items:center; gap:14px }
+  .adm-logo img { height:32px; width:auto }
+  .adm-logo span { font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  .adm-nav { display:flex; gap:6px }
+  .adm-nav a {
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    padding:7px 14px; border-radius:var(--r);
+    color:var(--dim); transition:background .2s, color .2s;
+  }
+  .adm-nav a:hover { background:var(--bg3); color:var(--ink) }
+  .adm-nav a.active { background:var(--gold-bg); color:var(--gold) }
+
+  .adm-main { max-width:1100px; margin:0 auto; padding:40px 32px 100px; }
+
+  /* ── SECTIONS ── */
+  .adm-section {
+    margin-bottom:56px;
+    border:1px solid var(--line);
+    border-radius:var(--r);
+    overflow:hidden;
+  }
+  .adm-section-head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+    background:var(--bg2);
+    border-bottom:1px solid var(--line);
+  }
+  .adm-section-head .num {
+    width:24px; height:24px; border-radius:50%;
+    background:var(--gold); color:#000;
+    font-size:12px; font-weight:700;
+    display:grid; place-items:center; flex-shrink:0;
+  }
+  .adm-section-head h2 {
+    margin:0; font-size:15px; font-weight:600; letter-spacing:.02em;
+    display:flex; align-items:center; gap:10px;
+  }
+  .adm-section-head .sub { font-size:11px; color:var(--mute); margin-left:4px; font-weight:400 }
+  .adm-section-body { padding:24px }
+
+  /* ── FORM ELEMENTS ── */
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field label { font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--mute) }
+  .field input, .field textarea {
+    background:var(--bg3); border:1px solid var(--line); border-radius:var(--r);
+    color:var(--ink); padding:10px 12px; font-size:13.5px;
+    transition:border-color .2s; outline:none; width:100%;
+  }
+  .field input:focus, .field textarea:focus { border-color:rgba(212,175,55,.5) }
+  .field textarea { min-height:60px; resize:vertical }
+
+  /* ── BUTTONS ── */
+  .btn-save {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 22px; border:0; border-radius:var(--r);
+    background:var(--gold); color:#000;
+    font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    cursor:pointer; transition:transform .18s, opacity .18s;
+  }
+  .btn-save:hover { transform:translateY(-1px) }
+  .btn-save:active { transform:none; opacity:.85 }
+  .btn-save:disabled { opacity:.4; cursor:default; transform:none }
+
+  .btn-ghost {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:9px 18px; border:1px solid var(--line); border-radius:var(--r);
+    background:transparent; color:var(--dim);
+    font-size:11.5px; font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+    cursor:pointer; transition:border-color .2s, color .2s;
+  }
+  .btn-ghost:hover { border-color:var(--gold); color:var(--gold) }
+
+  /* ── TOAST ── */
+  #toast {
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(16px);
+    background:var(--bg3); border:1px solid var(--line);
+    color:var(--ink); padding:12px 22px; border-radius:var(--r);
+    font-size:13px; letter-spacing:.04em;
+    opacity:0; pointer-events:none;
+    transition:opacity .3s, transform .3s;
+    z-index:200; white-space:nowrap;
+  }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0) }
+  #toast.ok   { border-color:var(--green); color:var(--green) }
+  #toast.err  { border-color:var(--red);   color:var(--red)   }
+
+  /* ── SECTION 1: PRÓXIMO EVENTO ── */
+  .hero-admin-grid {
+    display:grid; grid-template-columns:200px 1fr;
+    gap:28px; align-items:start;
+  }
+  .hero-slot-wrap {
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .hero-slot-wrap span { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--mute); text-align:center }
+  .hero-fields { display:grid; grid-template-columns:1fr 1fr; gap:14px }
+  .hero-fields .field:first-child { grid-column:1/-1 }
+  .hero-actions { margin-top:16px; display:flex; align-items:center; gap:12px }
+  @media(max-width:640px){ .hero-admin-grid{grid-template-columns:1fr} .hero-fields{grid-template-columns:1fr} }
+
+  /* ── SECTION 2: EVENTOS ── */
+  .events-admin-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+  }
+  @media(max-width:880px){ .events-admin-grid{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:480px){ .events-admin-grid{grid-template-columns:1fr} }
+
+  .ev-card {
+    background:var(--bg3); border:1px solid var(--line); border-radius:var(--r);
+    padding:16px; display:flex; flex-direction:column; gap:12px;
+  }
+  .ev-card .ev-num {
+    font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold)
+  }
+  .ev-card .ev-slot-wrap { width:100%; aspect-ratio:3/4 }
+  .ev-card .ev-slot-wrap image-slot { width:100%; height:100%; display:block }
+  .ev-card .ev-fields { display:flex; flex-direction:column; gap:8px }
+
+  /* ── SECTION 3: GALERIA ── */
+  .gallery-admin-tabs {
+    display:flex; gap:6px; margin-bottom:20px;
+    background:var(--bg3); padding:5px; border-radius:var(--r);
+    border:1px solid var(--line); width:fit-content;
+  }
+  .gallery-admin-tabs button {
+    background:transparent; border:0; color:var(--mute);
+    font-family:inherit; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    padding:7px 14px; border-radius:2px; cursor:pointer; transition:background .2s, color .2s;
+  }
+  .gallery-admin-tabs button.on { background:var(--gold); color:#000 }
+
+  .albums-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+  }
+  @media(max-width:880px){ .albums-grid{grid-template-columns:repeat(2,1fr)} }
+
+  .album-cell {
+    background:var(--bg3); border:1px solid var(--line); border-radius:var(--r);
+    padding:14px; display:flex; flex-direction:column; gap:10px;
+  }
+  .album-cell .album-slot { width:100%; aspect-ratio:4/3 }
+  .album-cell .album-slot image-slot { width:100%; height:100%; display:block }
+  .album-cell .album-label { font-size:12px; font-weight:600; color:var(--ink) }
+  .album-cell .album-sub { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--mute) }
+
+  .preview-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+    margin-top:24px;
+  }
+  @media(max-width:640px){ .preview-grid{grid-template-columns:repeat(2,1fr)} }
+  .preview-cell { background:var(--bg3); border:1px solid var(--line); border-radius:var(--r); aspect-ratio:4/3; overflow:hidden }
+  .preview-cell image-slot { width:100%; height:100%; display:block }
+  .gallery-actions { margin-top:20px; display:flex; align-items:center; gap:12px }
+
+  /* ── DIVIDER ── */
+  .adm-divider { height:1px; background:var(--line); margin:20px 0 }
+  .adm-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px }
+  .adm-label { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--mute) }
+
+  /* ── ABOUT IMG ── */
+  .about-admin { display:flex; align-items:flex-start; gap:24px }
+  .about-slot-wrap { flex-shrink:0; width:180px; height:225px }
+  .about-slot-wrap image-slot { width:100%; height:100%; display:block }
+  .about-info { color:var(--dim); font-size:13px; line-height:1.7 }
+
+  /* ── ALBUM PHOTO SLOTS ── */
+  .album-photo-tabs {
+    display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;
+  }
+  .album-photo-tab {
+    background:transparent; border:1px solid var(--line); border-radius:var(--r);
+    color:var(--mute); font-family:inherit; font-size:10px;
+    letter-spacing:.16em; text-transform:uppercase;
+    padding:7px 13px; cursor:pointer; transition:background .2s, color .2s, border-color .2s;
+  }
+  .album-photo-tab.on { background:var(--gold-bg); color:var(--gold); border-color:rgba(212,175,55,.4) }
+
+  .album-photos-panel { display:none }
+  .album-photos-panel.on { display:block }
+  .album-photos-grid {
+    display:grid; grid-template-columns:repeat(6,1fr); gap:6px;
+  }
+  @media(max-width:880px){ .album-photos-grid { grid-template-columns:repeat(4,1fr) } }
+  @media(max-width:480px){ .album-photos-grid { grid-template-columns:repeat(3,1fr) } }
+
+  .album-photo-cell {
+    aspect-ratio:1; background:var(--bg3);
+    border:1px solid var(--line); border-radius:2px; overflow:hidden;
+    position:relative;
+  }
+  .album-photo-cell image-slot { width:100%; height:100%; display:block }
+  .album-photo-num {
+    position:absolute; top:4px; left:4px;
+    font-size:9px; letter-spacing:.08em;
+    background:rgba(0,0,0,.75); color:var(--mute);
+    padding:2px 6px; border-radius:2px; pointer-events:none; z-index:1;
+  }
+</style>
+</head>
+<body>
+
+<!-- OMELETTE SHIM — habilita salvar imagens via image-slot -->
+<script>
+window.omelette = {
+  writeFile: function(filename, content) {
+    return fetch('/api/write-file', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename, content: content })
+    }).then(function(r){ return r.json() });
+  }
+};
+</script>
+
+<script src="image-slot.js"></script>
+
+<!-- HEADER -->
+<header class="adm-header">
+  <div class="adm-logo">
+    <img src="LOGO.png" alt="Eventos Litoral" />
+    <span>Painel Admin</span>
+  </div>
+  <nav class="adm-nav">
+    <a href="#proximo" class="active">Próximo Evento</a>
+    <a href="#agenda">Agenda</a>
+    <a href="#galeria">Galeria</a>
+    <a href="index.html" target="_blank" style="color:var(--gold)">↗ Ver Site</a>
+    <a href="fotos.html" target="_blank" style="color:var(--gold)">↗ Ver Fotos</a>
+  </nav>
+</header>
+
+<main class="adm-main">
+
+  <!-- ════════════════════════════════════════════════
+       SEÇÃO 1 — PRÓXIMO EVENTO DESTAQUE (HERO)
+  ════════════════════════════════════════════════ -->
+  <div class="adm-section" id="proximo">
+    <div class="adm-section-head">
+      <h2><span class="num">1</span> Próximo Evento — Destaque no Topo <span class="sub">aparece no hero da página inicial</span></h2>
+    </div>
+    <div class="adm-section-body">
+      <div class="hero-admin-grid">
+        <!-- flyer -->
+        <div class="hero-slot-wrap">
+          <image-slot id="hero-ev-flyer" shape="rect" placeholder="Flyer do evento&#10;(arrastar ou clicar)"></image-slot>
+          <span>Flyer / Arte do Evento</span>
+        </div>
+        <!-- campos de texto -->
+        <div>
+          <div class="hero-fields">
+            <div class="field" style="grid-column:1/-1">
+              <label>Nome do Evento</label>
+              <input id="f-nome" type="text" placeholder="Ex: Sunset Beats Litoral" />
+            </div>
+            <div class="field">
+              <label>Data</label>
+              <input id="f-data" type="text" placeholder="Ex: 15 Jun · Sáb" />
+            </div>
+            <div class="field">
+              <label>Local</label>
+              <input id="f-local" type="text" placeholder="Ex: Arena Guarujá — SP" />
+            </div>
+            <div class="field">
+              <label>Tag / Tipo</label>
+              <input id="f-tag" type="text" placeholder="Ex: Festival" />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Link de Ingressos</label>
+              <input id="f-link" type="url" placeholder="https://www.ingresso.com/..." />
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn-save" onclick="saveProximo()">Salvar próximo evento</button>
+            <span id="proximo-status" style="font-size:12px;color:var(--mute)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SEÇÃO 2 — AGENDA 2026 — FOTOS DOS EVENTOS
+  ════════════════════════════════════════════════ -->
+  <div class="adm-section" id="agenda">
+    <div class="adm-section-head">
+      <h2><span class="num">2</span> Agenda 2026 — Fotos dos Eventos <span class="sub">4 cards na página inicial</span></h2>
+    </div>
+    <div class="adm-section-body">
+      <div class="events-admin-grid" id="events-admin-grid">
+        <!-- preenchido por JS com os dados do cms.json -->
+      </div>
+      <div class="adm-divider"></div>
+      <div class="adm-row">
+        <button class="btn-save" onclick="saveEventos()">Salvar textos dos eventos</button>
+        <span id="eventos-status" style="font-size:12px;color:var(--mute)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SEÇÃO 3 — GALERIA DE FOTOS
+  ════════════════════════════════════════════════ -->
+  <div class="adm-section" id="galeria">
+    <div class="adm-section-head">
+      <h2><span class="num">3</span> Galeria de Fotos <span class="sub">fotos.html — interactive list</span></h2>
+    </div>
+    <div class="adm-section-body">
+
+      <div class="adm-label" style="margin-bottom:12px">Foto de capa de cada álbum (aparece no hover da lista)</div>
+      <div class="albums-grid" id="albums-grid">
+        <!-- preenchido por JS -->
+      </div>
+
+      <div class="adm-divider"></div>
+
+      <div class="adm-label" style="margin-bottom:4px">Fotos de cada álbum
+        <span style="font-size:10px;letter-spacing:normal;text-transform:none;color:var(--mute);font-weight:400"> — selecione o álbum e arraste as fotos (12 por álbum)</span>
+      </div>
+      <div class="album-photo-tabs" id="album-photo-tabs"></div>
+      <div id="album-photos-panels"></div>
+
+      <div class="adm-divider"></div>
+
+      <div class="adm-label" style="margin-bottom:12px">Preview na Página Inicial (6 células)</div>
+      <div class="preview-grid">
+        <div class="preview-cell"><image-slot id="pf-prev-0" shape="rect" placeholder="Preview 1"></image-slot></div>
+        <div class="preview-cell"><image-slot id="pf-prev-1" shape="rect" placeholder="Preview 2"></image-slot></div>
+        <div class="preview-cell"><image-slot id="pf-prev-2" shape="rect" placeholder="Preview 3"></image-slot></div>
+        <div class="preview-cell"><image-slot id="pf-prev-3" shape="rect" placeholder="Preview 4"></image-slot></div>
+        <div class="preview-cell"><image-slot id="pf-prev-4" shape="rect" placeholder="Preview 5"></image-slot></div>
+        <div class="preview-cell"><image-slot id="pf-prev-5" shape="rect" placeholder="Preview 6"></image-slot></div>
+      </div>
+
+      <div class="adm-divider"></div>
+
+      <div class="adm-label" style="margin-bottom:12px">Foto da seção "Sobre" (equipe / bastidor)</div>
+      <div class="about-admin">
+        <div class="about-slot-wrap">
+          <image-slot id="about-photo" shape="rect" placeholder="Foto da equipe / bastidor"></image-slot>
+        </div>
+        <div class="about-info">
+          <p>Esta foto aparece na seção <strong>Sobre a Eventos Litoral</strong>.<br/>Recomendado: retrato, proporção 4:5.</p>
+        </div>
+      </div>
+
+      <div class="adm-divider"></div>
+      <div class="gallery-actions">
+        <button class="btn-save" onclick="saveAlbums()">Salvar nomes dos álbuns</button>
+        <span id="albums-status" style="font-size:12px;color:var(--mute)"></span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── Estado CMS ───────────────────────────────────────────────
+var cms = null;
+
+async function loadCMS() {
+  try {
+    var r = await fetch('cms.json?_=' + Date.now());
+    cms = await r.json();
+  } catch(e) {
+    cms = { proximo:{}, eventos:[], albums:[] };
+  }
+  renderAll();
+}
+
+// ─── Render ───────────────────────────────────────────────────
+function renderAll() {
+  renderProximo();
+  renderEventos();
+  renderAlbums();
+}
+
+function renderProximo() {
+  var p = cms.proximo || {};
+  document.getElementById('f-nome').value  = p.nome    || '';
+  document.getElementById('f-data').value  = p.dataFull|| '';
+  document.getElementById('f-local').value = p.local   || '';
+  document.getElementById('f-tag').value   = p.tag     || '';
+  document.getElementById('f-link').value  = p.link    || '';
+}
+
+function renderEventos() {
+  var grid = document.getElementById('events-admin-grid');
+  grid.innerHTML = '';
+  (cms.eventos || []).forEach(function(ev, i) {
+    var card = document.createElement('div');
+    card.className = 'ev-card';
+    card.innerHTML =
+      '<div class="ev-num">Evento ' + (i+1) + '</div>' +
+      '<div class="ev-slot-wrap">' +
+        '<image-slot id="ev-img-' + ev.id + '" shape="rect" placeholder="Arte do evento&#10;' + ev.nome + '"></image-slot>' +
+      '</div>' +
+      '<div class="ev-fields">' +
+        '<div class="field"><label>Nome</label><input class="ev-f-nome" data-id="' + ev.id + '" value="' + esc(ev.nome) + '" /></div>' +
+        '<div class="field"><label>Data</label><input class="ev-f-data" data-id="' + ev.id + '" value="' + esc(ev.dataFull) + '" /></div>' +
+        '<div class="field"><label>Local</label><input class="ev-f-local" data-id="' + ev.id + '" value="' + esc(ev.local) + '" /></div>' +
+        '<div class="field"><label>Atração</label><input class="ev-f-atracao" data-id="' + ev.id + '" value="' + esc(ev.atracao) + '" /></div>' +
+        '<div class="field"><label>Tag</label><input class="ev-f-tag" data-id="' + ev.id + '" value="' + esc(ev.tag) + '" /></div>' +
+        '<div class="field"><label>Link Ingressos</label><input class="ev-f-link" data-id="' + ev.id + '" type="url" placeholder="https://..." value="' + esc(ev.link||'') + '" /></div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function renderAlbums() {
+  var grid = document.getElementById('albums-grid');
+  grid.innerHTML = '';
+  (cms.albums || []).forEach(function(alb) {
+    var cell = document.createElement('div');
+    cell.className = 'album-cell';
+    cell.innerHTML =
+      '<div class="album-slot">' +
+        '<image-slot id="fotos-cursor-' + alb.slug + '" shape="rect" placeholder="' + esc(alb.title) + '"></image-slot>' +
+      '</div>' +
+      '<div class="field"><input class="alb-f-title" data-slug="' + alb.slug + '" value="' + esc(alb.title) + '" /></div>' +
+      '<div class="album-sub">' + esc(alb.category) + ' · ' + alb.year + ' · ' + alb.count + '</div>';
+    grid.appendChild(cell);
+  });
+  renderAlbumPhotos();
+}
+
+var PER_ALBUM = 12;
+
+function renderAlbumPhotos() {
+  var tabsEl   = document.getElementById('album-photo-tabs');
+  var panelsEl = document.getElementById('album-photos-panels');
+  tabsEl.innerHTML   = '';
+  panelsEl.innerHTML = '';
+
+  var albums = cms.albums || [];
+  albums.forEach(function(alb, idx) {
+    // tab button
+    var btn = document.createElement('button');
+    btn.className = 'album-photo-tab' + (idx === 0 ? ' on' : '');
+    btn.textContent = alb.title;
+    btn.dataset.slug = alb.slug;
+    btn.onclick = function() { switchAlbumTab(alb.slug) };
+    tabsEl.appendChild(btn);
+
+    // panel with 12 slots
+    var panel = document.createElement('div');
+    panel.className = 'album-photos-panel' + (idx === 0 ? ' on' : '');
+    panel.id = 'alb-panel-' + alb.slug;
+
+    var gridHtml = '<div class="album-photos-grid">';
+    for (var n = 0; n < PER_ALBUM; n++) {
+      var slotId = 'fotos-album-' + alb.slug + '-' + n;
+      gridHtml +=
+        '<div class="album-photo-cell">' +
+          '<span class="album-photo-num">' + (n + 1) + '</span>' +
+          '<image-slot id="' + slotId + '" shape="rect" placeholder="Foto ' + (n+1) + '"></image-slot>' +
+        '</div>';
+    }
+    gridHtml += '</div>';
+    panel.innerHTML = gridHtml;
+    panelsEl.appendChild(panel);
+  });
+}
+
+function switchAlbumTab(slug) {
+  document.querySelectorAll('.album-photo-tab').forEach(function(b) {
+    b.classList.toggle('on', b.dataset.slug === slug);
+  });
+  document.querySelectorAll('.album-photos-panel').forEach(function(p) {
+    p.classList.toggle('on', p.id === 'alb-panel-' + slug);
+  });
+}
+
+// ─── Save functions ───────────────────────────────────────────
+async function saveProximo() {
+  cms.proximo = {
+    nome:     document.getElementById('f-nome').value.trim(),
+    dataFull: document.getElementById('f-data').value.trim(),
+    local:    document.getElementById('f-local').value.trim(),
+    tag:      document.getElementById('f-tag').value.trim(),
+    link:     document.getElementById('f-link').value.trim(),
+  };
+  await saveCMS('proximo-status', 'Próximo evento salvo!');
+}
+
+async function saveEventos() {
+  document.querySelectorAll('.ev-f-nome').forEach(function(el) {
+    var id = el.dataset.id;
+    var ev = cms.eventos.find(function(e){ return e.id === id });
+    if (!ev) return;
+    ev.nome     = el.value.trim();
+    ev.dataFull = el.closest('.ev-fields').querySelector('.ev-f-data').value.trim();
+    ev.local    = el.closest('.ev-fields').querySelector('.ev-f-local').value.trim();
+    ev.atracao  = el.closest('.ev-fields').querySelector('.ev-f-atracao').value.trim();
+    ev.tag      = el.closest('.ev-fields').querySelector('.ev-f-tag').value.trim();
+    ev.link     = el.closest('.ev-fields').querySelector('.ev-f-link').value.trim();
+  });
+  await saveCMS('eventos-status', 'Eventos salvos!');
+}
+
+async function saveAlbums() {
+  document.querySelectorAll('.alb-f-title').forEach(function(el) {
+    var slug = el.dataset.slug;
+    var alb = cms.albums.find(function(a){ return a.slug === slug });
+    if (alb) alb.title = el.value.trim();
+  });
+  await saveCMS('albums-status', 'Álbuns salvos!');
+}
+
+async function saveCMS(statusId, msg) {
+  try {
+    var r = await fetch('/api/write-file', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: 'cms.json', content: JSON.stringify(cms, null, 2) })
+    });
+    var j = await r.json();
+    if (j.ok) {
+      toast(msg, 'ok');
+      if (statusId) document.getElementById(statusId).textContent = '✓ ' + new Date().toLocaleTimeString('pt-BR');
+    } else {
+      toast('Erro: ' + (j.error || 'desconhecido'), 'err');
+    }
+  } catch(e) {
+    toast('Servidor offline? Rode: node admin-server.js', 'err');
+  }
+}
+
+// ─── Toast ───────────────────────────────────────────────────
+var toastTimer;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.className = '' }, 3200);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+// ─── Nav highlight on scroll ──────────────────────────────────
+var sections = ['proximo','agenda','galeria'];
+window.addEventListener('scroll', function() {
+  var pos = window.scrollY + 120;
+  sections.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var active = pos >= el.offsetTop && pos < el.offsetTop + el.offsetHeight;
+    var link = document.querySelector('.adm-nav a[href="#' + id + '"]');
+    if (link) link.classList.toggle('active', active);
+  });
+}, { passive:true });
+
+// ─── Init ─────────────────────────────────────────────────────
+loadCMS();
+</script>
+
+</body>
+</html>

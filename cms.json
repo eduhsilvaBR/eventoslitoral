@@ -1,0 +1,125 @@
+{
+  "proximo": {
+    "nome": "FAZER FALTA - MC LIVINHO - FINAL TOUR",
+    "dataFull": "20 JUNHO 2026",
+    "local": "Santos Convention Center",
+    "tag": "SHOW",
+    "link": "https://articket.com.br/e/6167/livinho-em-santos"
+  },
+  "eventos": [
+    {
+      "id": "ev1",
+      "nome": "MC LIVINHO",
+      "dia": "15",
+      "mes": "Jun",
+      "ano": "2026",
+      "dataFull": "15 de Junho · Sábado",
+      "local": "Arena Guarujá — SP",
+      "atracao": "DJ convidado + Open Sunset",
+      "tag": "Festival",
+      "link": ""
+    },
+    {
+      "id": "ev2",
+      "nome": "MC LIVINHO",
+      "dia": "22",
+      "mes": "Jun",
+      "ano": "2026",
+      "dataFull": "22 de Junho · Sábado",
+      "local": "Espaço Litoral Eventos",
+      "atracao": "Dupla sertaneja ao vivo",
+      "tag": "Show",
+      "link": ""
+    },
+    {
+      "id": "ev3",
+      "nome": "MC LIVINHO",
+      "dia": "06",
+      "mes": "Jul",
+      "ano": "2026",
+      "dataFull": "06 de Julho · Sábado",
+      "local": "Praia Club Santos",
+      "atracao": "Funk, eletrônico e convidados",
+      "tag": "Festa",
+      "link": ""
+    },
+    {
+      "id": "ev4",
+      "nome": "MC LIVINHO",
+      "dia": "20",
+      "mes": "Jul",
+      "ano": "2026",
+      "dataFull": "20 de Julho · Sábado",
+      "local": "Marina · Área Externa",
+      "atracao": "Shows ao vivo + DJs",
+      "tag": "Festival",
+      "link": ""
+    }
+  ],
+  "albums": [
+    {
+      "id": 1,
+      "slug": "shows-ao-vivo",
+      "title": "Shows ao Vivo",
+      "category": "Música",
+      "year": "2025",
+      "count": "48 fotos"
+    },
+    {
+      "id": 2,
+      "slug": "festivais",
+      "title": "Festivais",
+      "category": "Festival",
+      "year": "2025",
+      "count": "64 fotos"
+    },
+    {
+      "id": 3,
+      "slug": "festas-premium",
+      "title": "Festas Premium",
+      "category": "Entretenimento",
+      "year": "2024",
+      "count": "36 fotos"
+    },
+    {
+      "id": 4,
+      "slug": "sunset-sessions",
+      "title": "Sunset Sessions",
+      "category": "Especial",
+      "year": "2024",
+      "count": "31 fotos"
+    },
+    {
+      "id": 5,
+      "slug": "bastidores",
+      "title": "Bastidores",
+      "category": "Making Of",
+      "year": "2023",
+      "count": "28 fotos"
+    },
+    {
+      "id": 6,
+      "slug": "eventos-especiais",
+      "title": "Eventos Especiais",
+      "category": "Corporativo",
+      "year": "2023",
+      "count": "22 fotos"
+    },
+    {
+      "id": 7,
+      "slug": "beira-mar",
+      "title": "Beira-Mar",
+      "category": "Open Air",
+      "year": "2022",
+      "count": "40 fotos"
+    },
+    {
+      "id": 8,
+      "slug": "colecao-2022",
+      "title": "Coleção 2026",
+      "category": "Arquivo",
+      "year": "2022",
+      "count": "55 fotos"
+    }
+  ]
+}
