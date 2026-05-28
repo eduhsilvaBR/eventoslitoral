@@ -253,6 +253,19 @@ window.omelette = {
 
 <script src="image-slot.js"></script>
 
+<!-- AVISO: admin online não persiste imagens -->
+<script>
+(function() {
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isLocal) {
+    var banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999;background:#b45309;color:#fff;text-align:center;padding:10px 20px;font-size:12px;letter-spacing:.06em;';
+    banner.innerHTML = '⚠️ <strong>Admin online:</strong> as imagens salvas aqui são temporárias e NÃO aparecem no site. Para publicar imagens, use o admin local: <code style="background:rgba(0,0,0,.3);padding:2px 6px;border-radius:3px">node admin-server.js</code> → localhost:3000/admin → depois faça git push.';
+    document.body.prepend(banner);
+  }
+})();
+</script>
+
 <!-- HEADER -->
 <header class="adm-header">
   <div class="adm-logo">

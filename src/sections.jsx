@@ -9,21 +9,38 @@ const PROXIMO_DEFAULT = {
 };
 
 function Nav() {
+  const [open, setOpen] = useState(false);
+  const toggle = () => setOpen(o => !o);
+  const close  = () => setOpen(false);
+
   return (
-    <nav className="nav">
-      <div className="nav-inner">
-        <a href="#top" aria-label="Eventos Litoral">
-          <img className="nav-logo" src="LOGO.png" alt="Eventos Litoral" />
-        </a>
-        <div className="nav-links">
-          <a href="#eventos">Eventos</a>
-          <a href="#sobre">Sobre</a>
-          <a href="fotos.html">Fotos</a>
-          <a href="#contato">Contato</a>
+    <>
+      <nav className="nav">
+        <div className="nav-inner">
+          <a href="#top" aria-label="Eventos Litoral">
+            <img className="nav-logo" src="LOGO.png" alt="Eventos Litoral" />
+          </a>
+          <div className="nav-links">
+            <a href="#eventos">Eventos</a>
+            <a href="#sobre">Sobre</a>
+            <a href="fotos.html">Fotos</a>
+            <a href="#contato">Contato</a>
+          </div>
+          <button className="nav-burger" onClick={toggle} aria-label="Menu" aria-expanded={open}>
+            <span style={open ? {transform:'rotate(45deg) translate(5px,5px)'} : {}}></span>
+            <span style={open ? {opacity:0} : {}}></span>
+            <span style={open ? {transform:'rotate(-45deg) translate(5px,-5px)'} : {}}></span>
+          </button>
         </div>
-        <a href="#contato" className="nav-cta">Contratar</a>
+      </nav>
+
+      <div className={`nav-mobile${open ? ' open' : ''}`}>
+        <a href="#eventos" onClick={close}>Eventos</a>
+        <a href="#sobre"   onClick={close}>Sobre</a>
+        <a href="fotos.html" onClick={close}>Fotos</a>
+        <a href="#contato" onClick={close}>Contato</a>
       </div>
-    </nav>
+    </>
   );
 }
 

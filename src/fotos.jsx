@@ -169,6 +169,7 @@ function FotosPage() {
   }
 
   const albObj = openAlbum ? albums.find(a => a.slug === openAlbum) : null;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
@@ -184,9 +185,20 @@ function FotosPage() {
             <a href="fotos.html" style={{ color:"var(--gold)" }}>Fotos</a>
             <a href="index.html#contato">Contato</a>
           </div>
-          <a href="index.html#contato" className="nav-cta">Contratar</a>
+          <button className="nav-burger" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+            <span style={menuOpen ? {transform:'rotate(45deg) translate(5px,5px)'} : {}}></span>
+            <span style={menuOpen ? {opacity:0} : {}}></span>
+            <span style={menuOpen ? {transform:'rotate(-45deg) translate(5px,-5px)'} : {}}></span>
+          </button>
         </div>
       </nav>
+
+      <div className={`nav-mobile${menuOpen ? ' open' : ''}`}>
+        <a href="index.html#eventos" onClick={() => setMenuOpen(false)}>Eventos</a>
+        <a href="index.html#sobre"   onClick={() => setMenuOpen(false)}>Sobre</a>
+        <a href="fotos.html"         onClick={() => setMenuOpen(false)} style={{ color:"var(--gold)" }}>Fotos</a>
+        <a href="index.html#contato" onClick={() => setMenuOpen(false)}>Contato</a>
+      </div>
 
       {/* HEADER */}
       <div className="fotos-header">
